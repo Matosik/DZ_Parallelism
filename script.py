@@ -1,40 +1,28 @@
 import concurrent.futures
-
-def squared(b:float)-> float:
-    return b**2.0
-
-def two_part(a:float,c:float)->float:
-    return 4*a*c
-def root_squared(dis:float)->float:
-    return dis**0.5
-
-def root_denominator(a:float)->float:
-    return a*2
-def root_numerator(dis:float, b:float)->float:
-    if(dis>0):
-        return (-b+dis, -b-dis)
-    elif(dis==0):
-        return -b
+def dis(a,b,c):
+    return b**2 - 4 *a*c
+def roots(mass):
+    discr=mass[0]
+    b=mass[2]
+    a=mass[1]
+    return (-b+discr)/(2*a)
 
 if(__name__=="__main__"):
     a,b,c=map(float, input("Input a,b,c(with space): ").split())
+    print(f"{a}x^2 + {b}x + {c} = 0\n")
+    diskrim=dis(a,b,c)
     with concurrent.futures.ProcessPoolExecutor() as ex:
-
-        diskrim=0
-        diskrim+=squared(b)
-        diskrim-=two_part(a,c)
-        diskrim=root_squared(diskrim)
-
         if(diskrim==0):
-            root=root_numerator(diskrim,b)
-            root/=root_denominator(a)
-            print(root)
-        elif(diskrim<0):
-            print("Действительных корней нет")
+            result=roots(diskrim,a,b)
+            print(result)
+        elif(diskrim>0):
+            x1=[diskrim**0.5, a, b]
+            x2=[-(diskrim**0.5), a,b]
+            c=[]
+            c.append(x1)
+            c.append(x2)
+            result=ex.map(roots, c)
+            i=0
+            print(tuple(result))
         else:
-            root_1,root_2=root_numerator(diskrim,b)
-            root_1/=root_denominator(a)
-            root_2/=root_denominator(a)
-            print(root_1,root_2)
-
-
+            print("Действительных корней нет !!!")
